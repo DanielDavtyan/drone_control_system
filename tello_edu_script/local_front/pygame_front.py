@@ -1,17 +1,19 @@
+import time
+
 import pygame
 
 
 class PyFront:
-    def __init__(self, drone):
+    def __init__(self, drone, screen_width, screen_height):
         # initialize pygame
         pygame.init()
 
         # set screen dimensions
-        screen_width = 640
-        screen_height = 480
+        self.screen_width = screen_width
+        self.screen_height = screen_height
 
         # create screen
-        self.screen = pygame.display.set_mode((screen_width, screen_height))
+        self.screen = pygame.display.set_mode((self.screen_width, self.screen_height))
 
         # set font for text
         self.font = pygame.font.Font(None, 36)

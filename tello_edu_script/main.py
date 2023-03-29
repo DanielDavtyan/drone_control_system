@@ -1,9 +1,11 @@
 import pygame
 import time
 
+from drone_control_system.tello_edu_script.command_getter.command_getter import CommandGetter
+from drone_control_system.tello_edu_script.command_getter.commands import Command
+from drone_control_system.tello_edu_script.websocket_client.client import Client
 from local_front.pygame_front import PyFront
-from tello_edu_script.drone.drone import Drone
-
+from drone.drone import Drone
 
 drone = Drone()
 
@@ -11,9 +13,18 @@ drone.stream_on()
 
 drone.take_off()
 
+run_local = True
 
-py_front = PyFront(drone.drone)
+command = Command()
 
+if run_local:
+    command_getter = CommandGetter(command)
+else:
+    websocket_client = ""  # create client
+    client = Client(command, websocket_client)
+    client.recv()
+
+py_front = PyFront(drone.drone, 1024, 1024)
 
 running = True
 while running:
@@ -21,15 +32,18 @@ while running:
         if event.type == pygame.QUIT:
             running = False
 
-    speeds, commands = drone.get_pressed_keys()
+    if run_local:
+        speeds, commands = command_getter.get_speeds_and_commands()
+        command.set_speed(*speeds)
+        command.set_commands(commands)
 
-    drone.speed.set_speed(*speeds)
+    speeds, commands = command.get_speeds_and_commands()
 
     drone.run_command(commands)
 
     py_front.print_frame()
 
-    drone.drone.send_rc_control(*drone.speed.get_speeds())
+    drone.drone.send_rc_control(*speeds)
 
     pygame.display.update()
 
