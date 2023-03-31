@@ -5,7 +5,7 @@ from drone_control_system.tello_edu_script.command_getter.command_getter import 
 from drone_control_system.tello_edu_script.command_getter.commands import Command
 from drone_control_system.tello_edu_script.websocket_client.client import Client
 from local_front.pygame_front import PyFront
-from drone.drone import Drone
+from drone_control_system_2.drone.drone import Drone
 
 drone = Drone()
 
