@@ -1,8 +1,8 @@
 import json
 
 from flask import Flask, request
-from drone_control_system.flask_server.drone.drone import Drone
-from drone_control_system.flask_server.helpers.helpers import validate_parameters
+from flask_server.drone.drone import Drone
+from flask_server.helpers.helpers import validate_parameters
 
 app = Flask(__name__)
 
@@ -27,25 +27,24 @@ def take_off():
         return json.dumps({"exception": str(exception)})
 
 
-@app.route("/battery", methods=["GET"])
-def battery():
-    response = json.dumps({"battery_level": drone.get_battery()})
-    return response
-
-
 @app.route("/land")
 def land():
     drone.land()
-    drone.takeoff = False
     return json.dumps({"test": "test"})
 
 
 @app.route("/flip_back")
 def flip_back():
-    drone.is_fliping = True
     drone.flip_back()
-    drone.is_fliping = False
+    drone.send_speed()
+    drone.state.waiting()
     return json.dumps({"test": "test"})
+
+
+@app.route("/battery", methods=["GET"])
+def battery():
+    response = json.dumps({"battery_level": drone.get_battery()})
+    return response
 
 
 app.run(port=8888)

@@ -1,4 +1,4 @@
-from drone_control_system.flask_server.errors.errors import InvalidParameters
+from flask_server.errors.errors import InvalidParameters
 
 
 def validate_parameters(rules, params: dict):

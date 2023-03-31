@@ -1,6 +1,7 @@
 import time
 
 from djitellopy import Tello
+from flask_server.state_machine.state_machine import DroneState
 
 
 class Drone:
@@ -8,36 +9,31 @@ class Drone:
         self.drone = Tello()
         self.drone.connect()
         self.speeds = Speed()
-        self.takeoff = False
-        self.is_fliping = False
+        self.state = DroneState
 
     def stream_on(self):
         self.drone.streamon()
 
     def take_off(self):
+        self.state.take_off()
         self.drone.takeoff()
-        self.takeoff = True
+        self.state.waiting()
 
     def flip_back(self):
+        self.state.flip_back()
         self.drone.flip_back()
+        self.state.waiting()
 
     def land(self):
-        self.takeoff = False
         self.drone.land()
+        self.drone.land()
+        self.drone.on_floor()
 
     def get_battery(self):
         return self.drone.get_battery()
 
-    def run_command(self, commands):
-        for command in commands:
-            print(getattr(self, command))
-            print(command)
-            getattr(self, command)()
-
     def send_speed(self):
-        while self.takeoff:
-            if self.is_fliping:
-                continue
+        while self.state.state == "waiting":
             self.drone.send_rc_control(*self.speeds.get_speeds())
             time.sleep(0.03)
 
